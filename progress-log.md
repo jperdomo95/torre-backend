@@ -5,3 +5,6 @@
 23/10/2020 08:00 - 09:00 Torre's Api Behavior Research
 23/10/2020 9:00 - 11:00 Product Definition
 23/10/2020 11:00 - 00:00 App's Back-end Development
+
+23/10/2020 11:00 - 12:00 Make App's Algorithm on paper
+23/10/2020 13:00 - 16:30 Build endpoint

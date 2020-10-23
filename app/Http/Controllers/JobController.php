@@ -22,27 +22,35 @@ class JobController extends Controller
 
     public function index ($offset = 0)
     {
-        // Log::info($this->search_api_url);
-        return Http::post($this->search_api_url);
+        $jobs = $this->getJobs($offset);
+        return $this->getMembers($jobs);
     }
 
-    private function getJobs ()
+    private function getJobs ($offset)
     {
+        $jobsResponse = Http::post($this->search_api_url, [
+            'size' => $this->size,
+            'offset' => $offset
+        ]);
 
+        return $this->getJobDetails($jobsResponse->body());
     }
 
-    private function getJobDetails ()
+    private function getJobDetails ($jobs)
     {
+        foreach ($jobs->results as $i => $job) {
+            $job->detail = Http::get($this->jobs_api_url . '/' . $job->id)->body();
+        }
 
+        return $jobs;
     }
 
-    private function getMembers ()
+    private function getMembers ($jobs)
     {
+        foreach ($jobs->members as $i => $member) {
+            $member->detail = Http::get($this->members_api_url . '/' . $member->username)->body();
+        }
 
-    }
-
-    private function getMemberDetails ()
-    {
-
+        return $jobs;
     }
 }
