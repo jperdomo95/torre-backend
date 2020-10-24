@@ -12,45 +12,53 @@ class JobController extends Controller
     private $search_api_url;
     private $members_api_url;
     private $jobs_api_url;
+    private $jobsCollection;
 
     public function __construct()
     {
         $this->search_api_url = config('torre.api.search_url');
         $this->members_api_url = config('torre.api.members_url');
         $this->jobs_api_url = config('torre.api.jobs_url');
+        $this->jobsCollection = collect();
     }
 
     public function index ($offset = 0)
     {
-        $jobs = $this->getJobs($offset);
-        return $this->getMembers($jobs);
+        $this->getJobs($offset);
+        // $this->getMembers();
+        return $this->jobsCollection;
     }
 
     private function getJobs ($offset)
     {
         $jobsResponse = Http::post($this->search_api_url, [
-            'size' => $this->size,
+            'size' => 4,
             'offset' => $offset
-        ]);
-
-        return $this->getJobDetails($jobsResponse->body());
+        ])['results'];
+        $this->getJobDetails($jobsResponse);
     }
 
-    private function getJobDetails ($jobs)
+    private function getJobDetails ($jobsResponse)
     {
-        foreach ($jobs->results as $i => $job) {
-            $job->detail = Http::get($this->jobs_api_url . '/' . $job->id)->body();
+        foreach ($jobsResponse as $i => $job) {
+            $detailedJob = Http::get($this->jobs_api_url . '/' . $job['id'])->json();
+            $this->jobsCollection[$i] = collect(['job' => $job, 'detail' => $detailedJob ]);
         }
-
-        return $jobs;
     }
 
-    private function getMembers ($jobs)
+    private function getMembers ()
     {
-        foreach ($jobs->members as $i => $member) {
-            $member->detail = Http::get($this->members_api_url . '/' . $member->username)->body();
+        // dd($this->jobsCollection);
+        foreach ($this->jobsCollection as $i => $job) {
+            $this->getMembersDetails($job['detail']['members'], $i);
         }
+    }
 
-        return $jobs;
+    private function getMembersDetails ($members, $jobIndex)
+    {
+        //dd($members);
+        foreach ($members as $i => $member) {
+            $this->jobsCollection[$jobIndex]['memberDetail'] = Http::get($this->members_api_url . '/' . $member['person']['username'])->json();
+        }
     }
 }
