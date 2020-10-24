@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use App\Http\Resources\Job as JobResource;
+use App\Http\Resources\JobCollection;
 use Log;
 
 class JobController extends Controller

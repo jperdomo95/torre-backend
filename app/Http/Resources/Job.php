@@ -14,6 +14,22 @@ class Job extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        dd($this);
+        return [
+            'id'         => $this->job->id,
+            'title'      => $this->job->objective,
+            'name'       => $this->job->organizations[0]->name,
+            'picture'    => $this->job->organizations[0]->picture,
+            'team'       => $this->removeMemberKeys($this->job->members),
+            'cover'      => $this->detail->attachments[0]->address,
+            'slug'      => $this->detail->slug,
+        ];
+    }
+
+    private function removeMemberKeys($membersArray)
+    {
+        foreach ($membersArray as $i => $member) {
+            # code...
+        }
     }
 }
