@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use App\Http\Resources\Job as JobResource;
 use App\Http\Resources\JobCollection;
 use Log;
 
@@ -28,7 +26,7 @@ class JobController extends Controller
     {
         $this->getJobs($offset);
         // $this->getMembers();
-        return $this->jobsCollection;
+        return new JobCollection($this->jobsCollection);
     }
 
     private function getJobs ($offset)
